@@ -52,3 +52,6 @@ public static Album GetAlbum(string albumID);
 //Returns the name of a playlist
 public static string GetPlayListName(string playlistID);
 ```
+
+## Dependencies
+- Json.Net
