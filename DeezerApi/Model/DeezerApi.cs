@@ -51,12 +51,12 @@ namespace DeezerApi.Model
 				song.Track_Position = data.track_position;
 
 				//Album
-				if (album == null)
+				if (album.Name == null)
 				{
 					JObject albumJson = data.album;
 					data2 = albumJson;
 					album.Name = data2.title;
-					album.CoverUrl = data2.cover;
+					album.CoverUrl = data2.cover_xl;
 					album.ReleaseDate = data2.release_data;
 					album.Id = data2.id;
 				}
@@ -68,7 +68,7 @@ namespace DeezerApi.Model
 					data2 = artistJson;
 					artist.Name = data2.name;
 					artist.Id = data2.id;
-					artist.PictureUrl = data2.id;
+					artist.PictureUrl = data2.picture_xl;
 				}
 
 				song.Artist = artist;
