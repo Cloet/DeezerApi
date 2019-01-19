@@ -6,7 +6,33 @@ using System.Threading.Tasks;
 
 namespace DeezerApi.Model
 {
-	class Artist
+	public class Artist
 	{
+		private int _id;
+		private String _name;
+		private int _albums;
+
+		public int Id
+		{
+			get { return _id; }
+			set { _id = value; }
+		}
+
+		public int Albums
+		{
+			get { return _albums; }
+			set { _albums = value; }
+		}
+
+		public String Name
+		{
+			get { return _name; }
+			set { _name = value; }
+		}
+
+		public Artist()
+		{
+		}
+
 	}
 }
