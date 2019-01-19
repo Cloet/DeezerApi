@@ -8,6 +8,7 @@ namespace DeezerApi.Model
 {
 	public class Song
 	{
+		private int _id;
 		private String _releaseDate;
 		private int _duration;
 		private int _track_position;
@@ -15,6 +16,13 @@ namespace DeezerApi.Model
 		private String _title;
 		private Artist _artist;
 		private Album _album;
+
+
+		public int Id
+		{
+			get { return _id; }
+			set { _id = value; }
+		}
 
 		public String ReleaseDate
 		{

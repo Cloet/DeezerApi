@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -15,65 +16,102 @@ namespace DeezerApi.Model
 	{
 		private static HttpClient client = new HttpClient();
 
-
-		public static Song GetInfoSong(string trackID)
+		//Getting song info
+		public static Song GetInfoSong(string trackId, Artist artist, Album album)
 		{
-			string url = "https://api.deezer.com/track/" + trackID;
+			string url = "https://api.deezer.com/track/" + trackId;
 			var json = "";
+
 			Song song = new Song();
-			Album album = new Album();
-			Artist artist = new Artist();
+			Album al = album;
+			Artist ar = artist;
 
 			using (WebClient wc = new WebClient())
 			{
 				json = wc.DownloadString(url);
 			}
 
-
-			//Data van songs ophalen via deezer api calls
 			try
 			{
-
 				if (json == "{\"error\":{\"type\":\"Exception\",\"message\":\"Quota limit exceeded\",\"code\":4}}")
 				{
 					Thread.Sleep(5000);
-					using (WebClient wc = new WebClient())
-					{
-						json = wc.DownloadString(url);
-					}
+					GetInfoSong(trackId, ar, al);
 				}
-
 
 				dynamic data = JObject.Parse(json);
 				dynamic data2;
 
+				//Song
+				song.Id = data.id;
 				song.Title = data.title;
+				song.Disk_Number = data.disk_number;
+				song.ReleaseDate = data.release_data;
+				song.Duration = data.duration;
 				song.Track_Position = data.track_position;
 
-				JObject albumJson = data.album;
-				data2 = albumJson;
-				album.Name = data2.title;
-				album.Id = data2.id;
+				//Album
+				if (album == null)
+				{
+					JObject albumJson = data.album;
+					data2 = albumJson;
+					album.Name = data2.title;
+					album.CoverUrl = data2.cover;
+					album.ReleaseDate = data2.release_data;
+					album.Id = data2.id;
+				}
 
-				JObject artistJson = data.artist;
-				data2 = artistJson;
-				artist.Name = data2.name;
+				//Artist
+				if (artist.Name == null)
+				{
+					JObject artistJson = data.artist;
+					data2 = artistJson;
+					artist.Name = data2.name;
+					artist.Id = data2.id;
+					artist.PictureUrl = data2.id;
+				}
 
 				song.Artist = artist;
 				song.Album = album;
 				album.AddSong(song);
 
-				Thread.Sleep(200);
 				return song;
 
 			}
-			catch (Exception)
+			catch(Exception)
 			{
-				return null;
+				try
+				{
+					Thread.Sleep(200);
+					return GetInfoSong(trackId, ar, al);
+				}
+				catch (Exception)
+				{
+					return null;
+				}
 			}
+
 
 		}
 
+		public static Song GetInfoSong(string trackId, Artist artist)
+		{
+			return GetInfoSong(trackId, artist, new Album());
+		}
+
+		public static Song GetInfoSong(string trackId)
+		{
+			return GetInfoSong(trackId, new Artist(), new Album());
+		}
+
+		public static Song GetInfoSong(string trackId, Album album)
+		{
+			return GetInfoSong(trackId, new Artist(), album);
+		}
+
+
+
+		//Get songs in a playlist
 		public static List<Song> GetPlaylistSongs(string playlistid)
 		{
 			string url = "https://api.deezer.com/playlist/" + playlistid;
@@ -95,10 +133,7 @@ namespace DeezerApi.Model
 				if (json == "{\"error\":{\"type\":\"Exception\",\"message\":\"Quota limit exceeded\",\"code\":4}}")
 				{
 					Thread.Sleep(5000);
-					using (WebClient wc = new WebClient())
-					{
-						json = wc.DownloadString(url);
-					}
+					GetPlaylistSongs(playlistid);
 				}
 
 				var trackInfo = JObject.Parse(json)
@@ -127,6 +162,7 @@ namespace DeezerApi.Model
 			string url = "https://api.deezer.com/album/" + albumID;
 			var json = "";
 			List<Song> songInfo = new List<Song>();
+			Album al = new Album();
 
 			using (WebClient wc = new WebClient())
 			{
@@ -158,7 +194,7 @@ namespace DeezerApi.Model
 
 				foreach (var info in trackInfo)
 				{
-					songInfo.Add(GetInfoSong(info.ID.ToString()));
+					songInfo.Add(GetInfoSong(info.ID.ToString(),al));
 				}
 
 
@@ -176,6 +212,7 @@ namespace DeezerApi.Model
 			string url = "https://api.deezer.com/artist/" + artistID + "/top?limit=2000";
 			var json = "";
 			List<Song> songInfo = new List<Song>();
+			Artist artist = new Artist();
 
 			using (WebClient wc = new WebClient())
 			{
@@ -199,7 +236,7 @@ namespace DeezerApi.Model
 
 				foreach (var info in trackInfo)
 				{
-					songInfo.Add(GetInfoSong(info.ID.ToString()));
+					songInfo.Add(GetInfoSong(info.ID.ToString(),artist));
 				}
 
 
@@ -296,6 +333,7 @@ namespace DeezerApi.Model
 			}
 		}
 
+
 		public static Artist GetArtist(string artistID)
 		{
 			string url = "https://api.deezer.com/artist/" + artistID;
@@ -381,6 +419,7 @@ namespace DeezerApi.Model
 				return null;
 			}
 		}
+
 
 		public static string GetPlayListName(string playlistID)
 		{

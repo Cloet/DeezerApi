@@ -14,12 +14,19 @@ namespace DeezerApi.Model
 		private String _name;
 		private int _genreId;
 		private String _releaseDate;
+		private String _coverUrl;
 		private int _id;
 
 		public int Id
 		{
 			get { return _id; }
 			set { _id = value; }
+		}
+
+		public String CoverUrl
+		{
+			get { return _coverUrl; }
+			set { _coverUrl = value.Replace("//","/"); }
 		}
 
 		public List<Song> Songs

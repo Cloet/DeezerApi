@@ -8,9 +8,11 @@ namespace DeezerApi.Model
 {
 	public class Artist
 	{
+
 		private int _id;
 		private String _name;
 		private int _albums;
+		private String _pictureUrl;
 
 		public int Id
 		{
@@ -22,6 +24,12 @@ namespace DeezerApi.Model
 		{
 			get { return _albums; }
 			set { _albums = value; }
+		}
+
+		public String PictureUrl
+		{
+			get { return _pictureUrl; }
+			set { _pictureUrl = value.Replace("//","/"); }
 		}
 
 		public String Name
