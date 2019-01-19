@@ -12,6 +12,7 @@
 - Error handling
 - Clean up code
 - Better album, song and artist implementation
+- I'll probably rewrite 90% of it. It's old code but it works for now.
 
 ## Usage
 ```C#
